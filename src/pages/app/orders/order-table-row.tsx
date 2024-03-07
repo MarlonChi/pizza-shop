@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Search, X } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -7,7 +9,8 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { OrderDetails } from "./order-details";
 import { OrderStatus } from "./order-status";
-import { useState } from "react";
+import { CancelOrder } from "@/api/cancel-order";
+import { GetOrdersResponse } from "@/api/get-orders";
 
 interface OrderTableRow {
   order: {
@@ -21,6 +24,33 @@ interface OrderTableRow {
 
 export const OrderTableRow = ({ order }: OrderTableRow) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const querClient = useQueryClient();
+
+  const { mutateAsync: cancelOrderFn } = useMutation({
+    mutationFn: CancelOrder,
+    onSuccess: async (_, { orderId }) => {
+      const orderListCache = querClient.getQueriesData<GetOrdersResponse>({
+        queryKey: ["orders"],
+      });
+
+      orderListCache.forEach(([cacheKey, cacheData]) => {
+        if (!cacheData) {
+          return;
+        }
+
+        querClient.setQueryData<GetOrdersResponse>(cacheKey, {
+          ...cacheData,
+          orders: cacheData.orders.map((order) => {
+            if (order.orderId === orderId) {
+              return { ...order, status: "canceled" };
+            }
+
+            return order;
+          }),
+        });
+      });
+    },
+  });
 
   return (
     <TableRow>
@@ -61,7 +91,12 @@ export const OrderTableRow = ({ order }: OrderTableRow) => {
         </Button>
       </TableCell>
       <TableCell>
-        <Button variant="ghost" size="xs">
+        <Button
+          disabled={!["pending", "processing"].includes(order.status)}
+          onClick={() => cancelOrderFn({ orderId: order.orderId })}
+          variant="ghost"
+          size="xs"
+        >
           <X className="mr-2 h-3 w-3" />
           Cancelar
         </Button>
