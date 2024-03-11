@@ -4,21 +4,22 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+
 import { Button } from "./ui/button";
 
-export interface PaginationProps {
+interface PaginationProps {
   pageIndex: number;
   totalCount: number;
   perPage: number;
   onPageChange: (pageIndex: number) => Promise<void> | void;
 }
 
-export const Pagination = ({
+export function Pagination({
   pageIndex,
   perPage,
   totalCount,
   onPageChange,
-}: PaginationProps) => {
+}: PaginationProps) {
   const pages = Math.ceil(totalCount / perPage) || 1;
 
   return (
@@ -48,7 +49,7 @@ export const Pagination = ({
             disabled={pageIndex === 0}
           >
             <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Próxima página</span>
+            <span className="sr-only">Página anterior</span>
           </Button>
           <Button
             onClick={() => onPageChange(pageIndex + 1)}
@@ -57,7 +58,7 @@ export const Pagination = ({
             disabled={pages <= pageIndex + 1}
           >
             <ChevronRight className="h-4 w-4" />
-            <span className="sr-only">Página anterior</span>
+            <span className="sr-only">Próxima página</span>
           </Button>
           <Button
             onClick={() => onPageChange(pages - 1)}
@@ -66,10 +67,10 @@ export const Pagination = ({
             disabled={pages <= pageIndex + 1}
           >
             <ChevronsRight className="h-4 w-4" />
-            <span className="sr-only">Ultima página</span>
+            <span className="sr-only">Última página</span>
           </Button>
         </div>
       </div>
     </div>
   );
-};
+}
