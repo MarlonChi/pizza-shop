@@ -1,4 +1,4 @@
-![Cover](./.github/cover.PNG)
+![Cover](./.github/cover.png)
 
 # Pizza Shop
 
@@ -19,5 +19,5 @@ Acesse <http://localhost:5173> para visualizar a aplicação.
 
 Lista de pedidos
 <p align="center">
-  <img src=".github/image2.PNG" width="100%">
+  <img src=".github/image2.png" width="100%">
 </p>
